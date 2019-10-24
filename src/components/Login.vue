@@ -53,8 +53,10 @@ export default {
           url: 'http://localhost:8888/api/private/v1/login',
           data: this.form
         }).then(res => {
-          const { meta } = res.data
+          const { meta, data } = res.data
           if (meta.status === 200) {
+            // 一登录成功，就储 token 令牌（字符串）到本地
+            localStorage.setItem('token', data.token)
             console.log(meta.msg)
             this.$message({
               message: meta.msg,
