@@ -81,6 +81,9 @@ export default {
 <style lang="scss" scoped>
 .index {
   height: 100%;
+  .el-menu{
+        border:none;
+      }
   .el-header {
     background-color: #d8d8d8;
     display: flex;
@@ -93,9 +96,6 @@ export default {
     }
     .title {
       flex: 1;
-      .el-menu{
-        border:none;
-      }
       h1 {
         color: #545c64;
         height: 60px;
