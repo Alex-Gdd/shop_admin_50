@@ -6,6 +6,11 @@ import Users from '../components/Users.vue'
 import Roles from '../components/Roles.vue'
 import Rights from '../components/Rights.vue'
 
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push (location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+
 Vue.use(VueRouter)
 
 const routes = [
