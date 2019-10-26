@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 export default {
   data () {
     return {
@@ -41,47 +41,25 @@ export default {
     reset () {
       this.$refs.form.resetFields()
     },
-    login () {
-      this.$refs.form.validate(isValid => {
-        if (!isValid) return
-        console.log('发送了ajax')
-        console.log(this.form)
+    async login () {
+      try {
+        await this.$refs.form.validate()
+        const { meta, data } = await this.$axios.post('login', this.form)
+        if (meta.status === 200) {
+          localStorage.setItem('token', data.token)
+          this.$message({
+            message: meta.msg,
+            type: 'success',
+            duration: 1000
+          })
 
-        // 发送Ajax请求了
-        axios({
-          method: 'post',
-          url: 'http://localhost:8888/api/private/v1/login',
-          data: this.form
-        }).then(res => {
-          const { meta, data } = res.data
-          if (meta.status === 200) {
-            // 一登录成功，就储 token 令牌（字符串）到本地
-            localStorage.setItem('token', data.token)
-            console.log(meta.msg)
-            this.$message({
-              message: meta.msg,
-              type: 'success',
-              duration: 1000
-            })
-            this.$router.push({ name: 'index' })
-          } else {
-            console.log(meta.msg)
-            this.$message({
-              message: meta.msg,
-              type: 'error',
-              duration: 1000
-            })
-          }
-        })
-        // axios.post('http://localhost:8888/api/private/v1/login', this.form).then(res => {
-        //   const { meta } = res.data
-        //   if (meta.status === 200) {
-        //     console.log(meta.msg)
-        //   } else {
-        //     console.log(meta.msg)
-        //   }
-        // })
-      })
+          this.$router.push({ name: 'index' })
+        } else {
+          this.$message.error(meta.msg)
+        }
+      } catch (e) {
+        console.log(e)
+      }
     }
   }
 }

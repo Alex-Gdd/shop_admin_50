@@ -66,14 +66,12 @@ export default {
     logout () {
       this.$confirm('亲，你确定要退出系统吗？', '温馨提示', {
         type: 'warning'
+      }).then(() => {
+        localStorage.removeItem('token')
+        this.$router.push('/login')
+      }).catch(e => {
+        console.log(e)
       })
-        .then(() => {
-          localStorage.removeItem('token')
-          this.$router.push('/login')
-        })
-        .catch(e => {
-          console.log(e)
-        })
     }
   }
 }
