@@ -32,7 +32,7 @@
             plain
             icon="el-icon-delete"
           ></el-button>
-          <el-button type="success" size="small" plain icon="el-icon-check">分配角色</el-button>
+          <el-button @click="showAssignDialog(obj.row)" type="success" size="small" plain icon="el-icon-check">分配角色</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -96,6 +96,31 @@
         <el-button type="primary" @click="editUser">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 分配角色 -->
+    <el-dialog
+      title="添加角色"
+      :visible.sync="assignVisible"
+      width="40%">
+      <el-form :model="assignForm" label-width="80px">
+        <el-form-item label="用户名">
+          <el-tag type="info">{{ assignForm.username }}</el-tag>
+        </el-form-item>
+        <el-form-item label="角色列表">
+          <el-select v-model="assignForm.rid" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="assignVisible = false">取 消</el-button>
+        <el-button @click="assignRole" type="primary">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -136,12 +161,19 @@ export default {
         ]
       },
       editVisible: false,
+      assignVisible: false,
       editForm: {
         id: '',
         username: '',
         email: '',
         mobile: ''
-      }
+      },
+      assignForm: {
+        id: '',
+        rid: '',
+        username: ''
+      },
+      options: []
     }
   },
   // axios.get(url, config)   可以配置params, 也可以配置请求头等额外参数
@@ -248,6 +280,33 @@ export default {
         console.log(meta)
       } catch (e) {
         console.log(e)
+      }
+    },
+    async showAssignDialog (row) {
+      console.log(row)
+      this.assignVisible = true
+      this.assignForm.id = row.id
+      this.assignForm.username = row.username
+      const { meta, data } = await this.$axios.get('roles')
+      if (meta.status === 200) {
+        this.options = data
+      } else {
+        this.$message.error(meta.msg)
+      }
+    },
+    async assignRole () {
+      const { id, rid } = this.assignForm
+      if (rid === '') {
+        this.$message.error('全选择角色')
+        return
+      }
+      const { meta } = await this.$axios.put(`users/${id}/role`, { id, rid })
+      if (meta.status === 200) {
+        this.$message.success(meta.msg)
+        this.assignVisible = false
+        this.getUserList()
+      } else {
+        this.$message.error(meta.msg)
       }
     }
   }
