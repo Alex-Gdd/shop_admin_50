@@ -21,35 +21,15 @@
           text-color="#fff"
           active-text-color="#ffd04b"
         >
-          <el-submenu index="1">
-            <template slot="title">
+          <el-submenu :index="menu.path" v-for="menu in menuList" :key="menu.id">
+            <template v-slot:title>
               <i class="el-icon-location"></i>
-              <span>用户管理</span>
+              <span>{{ menu.authName }}</span>
             </template>
-            <el-menu-item-group>
-              <el-menu-item index="users">
+              <el-menu-item :index="item.path" v-for="item in menu.children" :key="item.id">
                 <i class="el-icon-menu"></i>
-                <span slot="title">用户列表</span>
+                <span slot="title">{{ item.authName }}</span>
               </el-menu-item>
-            </el-menu-item-group>
-          </el-submenu>
-          <el-submenu index="2">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>权限管理</span>
-            </template>
-            <el-menu-item-group>
-              <el-menu-item index="roles">
-                <i class="el-icon-menu"></i>
-                <span slot="title">角色列表</span>
-              </el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group>
-              <el-menu-item index="rights">
-                <i class="el-icon-menu"></i>
-                <span slot="title">权限列表</span>
-              </el-menu-item>
-            </el-menu-item-group>
           </el-submenu>
         </el-menu>
       </el-aside>
@@ -62,6 +42,22 @@
 
 <script>
 export default {
+  data () {
+    return {
+      menuList: []
+    }
+  },
+  computed: {
+    defaultActive () {
+      return this.$route.path.slice(1)
+    }
+  },
+  async created () {
+    const { meta, data } = await this.$axios.get('menus')
+    if (meta.status === 200) {
+      this.menuList = data
+    }
+  },
   methods: {
     logout () {
       this.$confirm('亲，你确定要退出系统吗？', '温馨提示', {
